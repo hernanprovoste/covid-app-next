@@ -5,8 +5,10 @@ const AdminPage = () => {
   return <Dashboard />
 }
 
+AdminPage.Layout = LayoutAdmin
+
 export default AdminPage
 
-AdminPage.getLayout = (page) => {
-  return <LayoutAdmin>{page}</LayoutAdmin>
-}
+// AdminPage.getLayout = (page) => {
+//   return <LayoutAdmin>{page}</LayoutAdmin>
+// }

@@ -3,17 +3,16 @@ import { useColorModeValue } from '@chakra-ui/color-mode'
 import { Img } from '@chakra-ui/image'
 import { Box, Flex, Text } from '@chakra-ui/layout'
 import { FiHome, FiUser, FiUsers, FiFileText } from 'react-icons/fi'
-import Logo from '../UI/Logo'
 import NavItem from './NavItem'
 
 const LinkItems = [
   { name: 'Home', icon: FiHome, url: '/admin' },
-  { name: 'Colaboradores', icon: FiUser, url: '#' },
-  { name: 'Declaraciones', icon: FiFileText, url: '#' },
-  { name: 'Usuarios', icon: FiUsers, url: '/admin/profile' }
+  { name: 'Colaboradores', icon: FiUser, url: '/admin/workers' },
+  { name: 'Declaraciones', icon: FiFileText, url: '/admin/declarations' },
+  { name: 'Usuarios', icon: FiUsers, url: '/admin/users' }
 ]
 
-const SidebarContent = ({ onClose, ...rest }) => {
+const SidebarContent = ({ onClose, image, ...rest }) => {
   return (
     <Box
       transition="3s ease"
@@ -27,7 +26,7 @@ const SidebarContent = ({ onClose, ...rest }) => {
     >
       <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
         <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
-          <Logo />
+          <Img src={image} alt="Logo Logica Industrial" height="40px" />
         </Text>
         <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
       </Flex>

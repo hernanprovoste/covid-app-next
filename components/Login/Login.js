@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import {
   Flex,
   Box,
@@ -6,7 +7,6 @@ import {
   Input,
   Checkbox,
   Stack,
-  Link,
   Button,
   Heading,
   Text,

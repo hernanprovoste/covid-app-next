@@ -5,8 +5,10 @@ const ProfilePage = () => {
   return <UserProfile />
 }
 
+ProfilePage.Layout = LayoutAdmin
+
 export default ProfilePage
 
-ProfilePage.getLayout = (page) => {
-  return <LayoutAdmin>{page}</LayoutAdmin>
-}
+// ProfilePage.getLayout = (page) => {
+//   return <LayoutAdmin>{page}</LayoutAdmin>
+// }

@@ -12,6 +12,7 @@ const LayoutAdmin = ({ children }) => {
       <SidebarContent
         onClose={() => onClose}
         display={{ base: 'none', md: 'block' }}
+        image={'./logicaLogo.svg'}
       />
       <Drawer
         autoFocus={false}

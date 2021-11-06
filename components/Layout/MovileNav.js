@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { Avatar } from '@chakra-ui/avatar'
 import { IconButton } from '@chakra-ui/button'
 import { useColorModeValue } from '@chakra-ui/color-mode'
@@ -71,7 +72,9 @@ const MobileNav = ({ onOpen, ...rest }) => {
               bg={useColorModeValue('white', 'gray.900')}
               borderColor={useColorModeValue('gray.200', 'gray.700')}
             >
-              <MenuItem>Perfil</MenuItem>
+              <MenuItem>
+                <Link href="./profile">Perfil</Link>
+              </MenuItem>
               <MenuDivider />
               <MenuItem>Cerrar Sesi&oacute;n</MenuItem>
             </MenuList>

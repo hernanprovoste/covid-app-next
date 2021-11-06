@@ -1,5 +1,6 @@
+import Link from 'next/link'
 import Icon from '@chakra-ui/icon'
-import { Flex, Link } from '@chakra-ui/layout'
+import { Flex } from '@chakra-ui/layout'
 
 const NavItem = ({ icon, url, children, ...rest }) => {
   return (
