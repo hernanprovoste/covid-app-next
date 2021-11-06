@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router'
 import { useColorModeValue } from '@chakra-ui/color-mode'
+import { useToast } from '@chakra-ui/toast'
 import { Box, Flex, Heading, Stack } from '@chakra-ui/layout'
 import {
   Table,
@@ -16,6 +17,7 @@ import SearchInput from '../UI/SearchInput'
 
 const Users = () => {
   const router = useRouter()
+  const toast = useToast()
 
   const handleNewUser = () => {
     router.push('./users/newuser')
