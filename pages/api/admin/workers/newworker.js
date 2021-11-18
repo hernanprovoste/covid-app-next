@@ -3,7 +3,6 @@ import {
   findOneDocument,
   insertDocument
 } from '../../../../herlpers/db-utils'
-import { hashPassword } from '../../../../herlpers/hash-pwd'
 
 const handler = async (req, res) => {
   if (req.method !== 'POST') {
@@ -18,7 +17,9 @@ const handler = async (req, res) => {
     last_name,
     second_last_name,
     email,
-    password,
+    address,
+    phone,
+    mobile,
     created_by
   } = data
 
@@ -28,11 +29,10 @@ const handler = async (req, res) => {
     !last_name &&
     !email &&
     !email.includes('@') &&
-    !password &&
-    !password.trim().length < 7
+    !address
   ) {
     res.status(422).json({
-      message: `Datos ingresados no son v&aacute;lidos, la constrase&ntilde;a debe tener m&iacute;nimo 7 caracteres.`
+      message: `Datos ingresados no son validos.`
     })
     return
   }
@@ -47,10 +47,14 @@ const handler = async (req, res) => {
   }
 
   try {
-    const existingUser = await findOneDocument(client, 'users', { dni: dni })
+    const existingWorker = await findOneDocument(client, 'workers', {
+      dni: dni
+    })
 
-    if (existingUser) {
-      res.status(422).json({ message: 'Usuario ya se encuentra registrado.' })
+    if (existingWorker) {
+      res
+        .status(422)
+        .json({ message: 'Colaborador ya se encuentra registrado.' })
       client.close()
       return
     }
@@ -59,16 +63,16 @@ const handler = async (req, res) => {
     return
   }
 
-  const hashedPassword = await hashPassword(password)
-
   try {
-    await insertDocument(client, 'users', {
+    await insertDocument(client, 'workers', {
       dni: dni,
       name: name,
       last_name: last_name,
       second_last_name: second_last_name,
       email: email,
-      password: hashedPassword,
+      address: address,
+      phone: phone,
+      mobile: mobile,
       created_by: created_by,
       created_at: new Date()
     })
@@ -78,7 +82,7 @@ const handler = async (req, res) => {
     return
   }
 
-  res.status(201).json({ message: 'User created!' })
+  res.status(201).json({ message: 'Worker created!' })
 }
 
 export default handler

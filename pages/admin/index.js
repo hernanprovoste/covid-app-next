@@ -1,3 +1,4 @@
+import { getSession } from 'next-auth/client'
 import Dashboard from '../../components/Dashboard/Dashboard'
 import LayoutAdmin from '../../components/Layout/LayoutAdmin'
 
@@ -7,8 +8,24 @@ const AdminPage = () => {
 
 AdminPage.Layout = LayoutAdmin
 
-export default AdminPage
+export const getServerSideProps = async (context) => {
+  const session = await getSession({ req: context.req })
+  console.log(session)
 
-// AdminPage.getLayout = (page) => {
-//   return <LayoutAdmin>{page}</LayoutAdmin>
-// }
+  if (!session) {
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false
+      }
+    }
+  }
+
+  return {
+    props: {
+      session
+    }
+  }
+}
+
+export default AdminPage

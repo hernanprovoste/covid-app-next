@@ -11,8 +11,9 @@ import {
   SimpleGrid,
   Stack
 } from '@chakra-ui/layout'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useToast } from '@chakra-ui/toast'
+import { useSession } from 'next-auth/client'
 
 const initialState = {
   dni: '',
@@ -24,10 +25,19 @@ const initialState = {
   repeat_password: ''
 }
 
-const FormUser = () => {
+const FormUser = ({ typeForm, userId }) => {
   const [user, setUser] = useState(initialState)
   const router = useRouter()
   const toast = useToast()
+  const [session, loading] = useSession()
+  const [password, setPassword] = useState()
+
+  // if (typeForm === 'edit') {
+  //   useEffect(() => {
+  //     setUser(userId.users)
+  //     setPassword(user.password)
+  //   }, [])
+  // }
 
   const handleInput = (e) => {
     const { name, value } = e.target
@@ -51,63 +61,103 @@ const FormUser = () => {
     e.preventDefault()
     // console.log(user)
 
-    toast({
-      title: 'Enviando datos',
-      description: 'Ingresando datos a la base de datos',
-      status: 'info',
-      duration: 9000,
-      isClosable: true
-    })
-
-    fetch('/api/admin/users/newuser', {
-      method: 'POST',
-      body: JSON.stringify({
-        dni: user.dni,
-        name: user.name,
-        last_name: user.last_name,
-        second_last_name: user.second_last_name,
-        email: user.email,
-        password: user.password
-      }),
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-      .then((res) => {
-        if (res.ok) {
-          return res.json()
-        }
-
-        res.json().then((data) => {
-          toast({
-            title: 'Error',
-            description: data.message || 'Ha ocurrido un problema',
-            status: 'error',
-            duration: 9000,
-            isClosable: true
-          })
-          return
-          // throw new Error(data.message || 'Something went wrong!')
-        })
+    if (typeForm === 'edit') {
+      toast({
+        title: 'Coming soon',
+        description: 'Se editaran los cambios en la proxima release',
+        status: 'info',
+        duration: 9000,
+        isClosable: true
       })
-      .then((data) => {
+    }
+
+    if (user.password === user.repeat_password) {
+      if (
+        !user.dni ||
+        !user.name ||
+        !user.last_name ||
+        !user.email ||
+        !user.email.includes('@') ||
+        !user.password ||
+        !user.password.trim().length < 7
+      ) {
         toast({
-          title: 'Datos guardados',
-          description: 'Datos guardados satisfactoriamente',
-          status: 'success',
+          title: 'Enviando datos',
+          description: 'Ingresando datos a la base de datos',
+          status: 'info',
           duration: 9000,
           isClosable: true
         })
-      })
-      .catch((error) => {
+
+        fetch('/api/admin/users/newuser', {
+          method: 'POST',
+          body: JSON.stringify({
+            dni: user.dni,
+            name: user.name,
+            last_name: user.last_name,
+            second_last_name: user.second_last_name,
+            email: user.email,
+            password: user.password,
+            created_by: session.user.email
+          }),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+          .then((res) => {
+            if (res.ok) {
+              return res.json()
+            }
+
+            res.json().then((data) => {
+              toast({
+                title: 'Error',
+                description: data.message || 'Ha ocurrido un problema',
+                status: 'error',
+                duration: 9000,
+                isClosable: true
+              })
+              return
+              // throw new Error(data.message || 'Something went wrong!')
+            })
+          })
+          .then((data) => {
+            toast({
+              title: 'Datos guardados',
+              description: 'Datos guardados satisfactoriamente',
+              status: 'success',
+              duration: 9000,
+              isClosable: true
+            })
+          })
+          .catch((error) => {
+            toast({
+              title: 'Error',
+              description: error.message || 'Ha ocurrido un problema',
+              status: 'error',
+              duration: 9000,
+              isClosable: true
+            })
+          })
+      } else {
         toast({
           title: 'Error',
-          description: error.message || 'Ha ocurrido un problema',
+          description:
+            'Datos ingresados no son válidos, la contraseña debe tener mínimo 7 caracteres.',
           status: 'error',
           duration: 9000,
           isClosable: true
         })
+      }
+    } else {
+      toast({
+        title: 'Error',
+        description: 'Las constraseñas no coinciden.',
+        status: 'error',
+        duration: 9000,
+        isClosable: true
       })
+    }
   }
 
   return (
@@ -115,7 +165,9 @@ const FormUser = () => {
       <Flex minH={'100%'} align={'center'} justify={'center'} width="full">
         <Stack spacing={8} width="full" py={4} px={2}>
           <Stack align={'left'}>
-            <Heading fontSize={'4xl'}>Nuevo Usuario</Heading>
+            <Heading fontSize={'4xl'}>
+              {typeForm ? 'Editar' : 'Nuevo'} Usuario
+            </Heading>
           </Stack>
           <Box
             rounded={'lg'}
@@ -131,7 +183,7 @@ const FormUser = () => {
                   <Input
                     placeholder="12345678-9"
                     name="dni"
-                    value={user.dni}
+                    value={user.dni || undefined}
                     onChange={handleInput}
                   />
                 </FormControl>
@@ -142,7 +194,7 @@ const FormUser = () => {
                   <Input
                     placeholder="John"
                     name="name"
-                    value={user.name}
+                    value={user.name || undefined}
                     onChange={handleInput}
                   />
                 </FormControl>
@@ -153,7 +205,7 @@ const FormUser = () => {
                   <Input
                     placeholder="Doe"
                     name="last_name"
-                    value={user.last_name}
+                    value={user.last_name || undefined}
                     onChange={handleInput}
                   />
                 </FormControl>
@@ -164,7 +216,7 @@ const FormUser = () => {
                   <Input
                     placeholder="Smith"
                     name="second_last_name"
-                    value={user.second_last_name}
+                    value={user.second_last_name || undefined}
                     onChange={handleInput}
                   />
                 </FormControl>
@@ -176,31 +228,32 @@ const FormUser = () => {
                     placeholder="johndoesmith@email.com"
                     name="email"
                     type="email"
-                    value={user.email}
+                    value={user.email || undefined}
                     onChange={handleInput}
                   />
                 </FormControl>
               </GridItem>
               <GridItem colSpan={1}>
-                <FormControl id="password" isRequired>
+                <FormControl id="password" isRequired={typeForm ? false : true}>
                   <FormLabel>Password</FormLabel>
                   <Input
                     placeholder="Password"
                     type="password"
                     name="password"
-                    value={user.password}
                     onChange={handleInput}
                   />
                 </FormControl>
               </GridItem>
               <GridItem colSpan={1}>
-                <FormControl id="repeat_password" isRequired>
+                <FormControl
+                  id="repeat_password"
+                  isRequired={typeForm ? false : true}
+                >
                   <FormLabel>Repetir Password</FormLabel>
                   <Input
                     placeholder="Repeat Password"
                     type="password"
                     name="repeat_password"
-                    value={user.repeat_password}
                     onChange={handleInput}
                   />
                 </FormControl>
@@ -222,7 +275,7 @@ const FormUser = () => {
                   _hover={{ bg: 'brand.400' }}
                   type="submit"
                 >
-                  Crear Usuario
+                  {typeForm ? 'Editar' : 'Crear'} Usuario
                 </Button>
               </GridItem>
             </SimpleGrid>

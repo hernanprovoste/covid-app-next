@@ -9,6 +9,7 @@ import { Radio, RadioGroup } from '@chakra-ui/radio'
 import { Checkbox } from '@chakra-ui/checkbox'
 import CardAlertCovid from '../UI/Alert'
 import { FormControl, FormLabel } from '@chakra-ui/form-control'
+import { useToast } from '@chakra-ui/toast'
 
 const initialState = {
   dni: '',
@@ -43,6 +44,7 @@ const initialState = {
 const FormsCovid = () => {
   const [workerSymptoms, setWorkerSymptoms] = useState(initialState)
   const { symptomsChecked } = workerSymptoms
+  const toast = useToast()
 
   const handleChangeInputs = (e) => {
     const { name, value } = e.target
@@ -64,7 +66,75 @@ const FormsCovid = () => {
 
   const registrationForm = (e) => {
     e.preventDefault()
-    console.log(workerSymptoms)
+
+    if (!workerSymptoms.dni && !workerSymptoms.cellphone) {
+      toast({
+        title: 'Error',
+        description: 'Debe ingresar los datos solicitados.',
+        status: 'error',
+        duration: 9000,
+        isClosable: true
+      })
+    } else {
+      toast({
+        title: 'Enviando datos',
+        description: 'Ingresando datos a la base de datos',
+        status: 'info',
+        duration: 9000,
+        isClosable: true
+      })
+
+      fetch('/api/declaration/newdeclaration', {
+        method: 'POST',
+        body: JSON.stringify({
+          dni: workerSymptoms.dni,
+          cellphone: workerSymptoms.cellphone,
+          physicalFeeling: workerSymptoms.physicalFeeling,
+          symptoms: workerSymptoms.symptoms,
+          symptomsChecked: workerSymptoms.symptomsChecked,
+          physicalContact: workerSymptoms.physicalContact,
+          created_at: workerSymptoms.created_at
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+        .then((res) => {
+          if (res.ok) {
+            return res.json()
+          }
+
+          res.json().then((data) => {
+            toast({
+              title: 'Error',
+              description: data.message || 'Ha ocurrido un problema',
+              status: 'error',
+              duration: 9000,
+              isClosable: true
+            })
+            return
+            // throw new Error(data.message || 'Something went wrong!')
+          })
+        })
+        .then((data) => {
+          toast({
+            title: 'Datos guardados',
+            description: 'Datos guardados satisfactoriamente',
+            status: 'success',
+            duration: 9000,
+            isClosable: true
+          })
+        })
+        .catch((error) => {
+          toast({
+            title: 'Error',
+            description: error.message || 'Ha ocurrido un problema',
+            status: 'error',
+            duration: 9000,
+            isClosable: true
+          })
+        })
+    }
   }
 
   return (
@@ -135,7 +205,7 @@ const FormsCovid = () => {
                   <FormLabel fontSize="20px" fontWeight="bold">
                     ¿Cómo te sientes físicamente hoy?
                   </FormLabel>
-                  <RadioGroup name="physicalFeeling" defaultValue="bien">
+                  <RadioGroup name="physicalFeeling">
                     <Stack direction="column">
                       <Radio
                         value="bien"
@@ -166,62 +236,68 @@ const FormsCovid = () => {
                 </FormControl>
               </Stack>
             </Box>
-            <Box w="100%">
-              <Stack spacing={4}>
-                <FormControl id="symptoms" isRequired>
-                  <FormLabel fontSize="20px" fontWeight="bold">
-                    Seleccione el síntoma según corresponda, si presenta 1 de
-                    estos síntomas comunicar al: +569 1234 5678
-                  </FormLabel>
-                  <RadioGroup name="symptoms" defaultValue="fiebre">
-                    <Stack direction="column">
-                      <Radio
-                        value="fiebre"
-                        onChange={handleRadioButtons}
-                        colorScheme="brand"
-                        id="fiebre"
-                      >
-                        Fiebre (Temperatura superior a 37,8°C) y/o pérdida
-                        brusca del gusto u olfato
-                      </Radio>
-                      <Radio
-                        value="otro"
-                        id="otro"
-                        onChange={handleRadioButtons}
-                        colorScheme="brand"
-                      >
-                        Otro
-                      </Radio>
-                    </Stack>
-                  </RadioGroup>
-                </FormControl>
-              </Stack>
-            </Box>
-            <CardAlertCovid />
-            <CardAlertCovid />
-            <Box w="100%">
-              <FormControl id="symptomsChecked">
-                <FormLabel fontSize="20px" fontWeight="bold">
-                  Seleccione según corresponda, si presenta 2 o más de estos
-                  síntomas comunicar al: +569 1234 5678
-                </FormLabel>
+            {workerSymptoms.physicalFeeling === 'molestias' ? (
+              <Box w="100%">
                 <Stack spacing={4}>
-                  {symptomsChecked.map((item) => (
-                    <Checkbox
-                      key={item.id}
-                      value={item.name}
-                      name={item.name}
-                      checked={item.checked}
-                      onChange={handleCheckedElement}
-                      colorScheme="brand"
-                    >
-                      {item.name}
-                    </Checkbox>
-                  ))}
+                  <FormControl id="symptoms" isRequired>
+                    <FormLabel fontSize="20px" fontWeight="bold">
+                      Seleccione el síntoma según corresponda, si presenta 1 de
+                      estos síntomas comunicar al: +569 1234 5678
+                    </FormLabel>
+                    <RadioGroup name="symptoms">
+                      <Stack direction="column">
+                        <Radio
+                          value="fiebre"
+                          onChange={handleRadioButtons}
+                          colorScheme="brand"
+                          id="fiebre"
+                        >
+                          Fiebre (Temperatura superior a 37,8°C) y/o pérdida
+                          brusca del gusto u olfato
+                        </Radio>
+                        <Radio
+                          value="otro"
+                          id="otro"
+                          onChange={handleRadioButtons}
+                          colorScheme="brand"
+                        >
+                          Otro
+                        </Radio>
+                      </Stack>
+                    </RadioGroup>
+                  </FormControl>
                 </Stack>
-              </FormControl>
-            </Box>
-            <CardAlertCovid />
+              </Box>
+            ) : workerSymptoms.physicalFeeling === 'mal' ? (
+              <CardAlertCovid />
+            ) : null}
+            {workerSymptoms.symptoms === 'fiebre' ? (
+              <CardAlertCovid />
+            ) : workerSymptoms.symptoms === 'otro' ? (
+              <Box w="100%">
+                <FormControl id="symptomsChecked">
+                  <FormLabel fontSize="20px" fontWeight="bold">
+                    Seleccione según corresponda, si presenta 2 o más de estos
+                    síntomas comunicar al: +569 1234 5678
+                  </FormLabel>
+                  <Stack spacing={4}>
+                    {symptomsChecked.map((item) => (
+                      <Checkbox
+                        key={item.id}
+                        value={item.name}
+                        name={item.name}
+                        checked={item.checked}
+                        onChange={handleCheckedElement}
+                        colorScheme="brand"
+                      >
+                        {item.name}
+                      </Checkbox>
+                    ))}
+                  </Stack>
+                </FormControl>
+              </Box>
+            ) : null}
+
             <Box w="100%">
               <Stack spacing={4}>
                 <FormControl id="physicalContact" isRequired>
@@ -229,7 +305,7 @@ const FormsCovid = () => {
                     ¿Estuvo en contacto estrecho con un caso confirmado? Si su
                     respuesta es Sí, llamar: +569 1234 5678
                   </FormLabel>
-                  <RadioGroup name="physicalContact" defaultValue="si">
+                  <RadioGroup name="physicalContact">
                     <Stack direction="column">
                       <Radio
                         value="si"
@@ -254,6 +330,9 @@ const FormsCovid = () => {
                 </FormControl>
               </Stack>
             </Box>
+            {workerSymptoms.physicalContact === 'si' ? (
+              <CardAlertCovid />
+            ) : null}
             <Box w="100%">
               <Button type="submit" size="md" colorScheme="brand" isFullWidth>
                 Enviar

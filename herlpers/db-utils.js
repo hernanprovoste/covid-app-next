@@ -24,19 +24,42 @@ export const findOneDocument = async (client, collection, document) => {
   return result
 }
 
-export const getAllDocuments = async (
+export const updateDocument = async (
   client,
   collection,
-  sort,
-  filter = {}
+  idChange,
+  document
 ) => {
   const db = client.db()
 
-  const document = await db
+  const result = await db
     .collection(collection)
-    .find(filter)
-    .sort(sort)
-    .toArray()
+    .update(`${idChange}, $set: ${document}`)
+
+  return result
+}
+
+// export const getAllDocuments = async (
+//   client,
+//   collection,
+//   sort,
+//   filter = {}
+// ) => {
+//   const db = client.db()
+
+//   const document = await db
+//     .collection(collection)
+//     .find(filter)
+//     .sort(sort)
+//     .toArray()
+
+//   return document
+// }
+
+export const getAllDocuments = async (client, collection) => {
+  const db = client.db()
+
+  const document = await db.collection(collection).find().toArray()
 
   return document
 }

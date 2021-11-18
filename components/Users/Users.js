@@ -15,12 +15,17 @@ import {
 } from '@chakra-ui/react'
 import SearchInput from '../UI/SearchInput'
 
-const Users = () => {
+const Users = (props) => {
   const router = useRouter()
   const toast = useToast()
+  const { users } = props.data.users
 
   const handleNewUser = () => {
     router.push('./users/newuser')
+  }
+
+  const selectUser = (id) => {
+    router.push(`./users/${id}`)
   }
 
   return (
@@ -68,82 +73,39 @@ const Users = () => {
                 <Th>Apellido Paterno</Th>
                 <Th>Apellido Materno</Th>
                 <Th>Created At</Th>
+                <Th>Created By</Th>
                 <Th>Acciones</Th>
               </Tr>
             </Thead>
             <Tbody>
-              <Tr>
-                <Td>12345678-9</Td>
-                <Td>John</Td>
-                <Td>Doe</Td>
-                <Td>Smith</Td>
-                <Td>12/11/2021</Td>
-                <Td>
-                  <Button
-                    mr={2}
-                    bg={'brand.500'}
-                    color="white"
-                    _hover={{ bg: 'brand.400' }}
-                  >
-                    Editar
-                  </Button>
-                  <Button
-                    bg={'danger.500'}
-                    color="white"
-                    _hover={{ bg: 'danger.400' }}
-                  >
-                    Eliminar
-                  </Button>
-                </Td>
-              </Tr>
-              <Tr>
-                <Td>12345678-9</Td>
-                <Td>John</Td>
-                <Td>Doe</Td>
-                <Td>Smith</Td>
-                <Td>12/11/2021</Td>
-                <Td>
-                  <Button
-                    mr={2}
-                    bg={'brand.500'}
-                    color="white"
-                    _hover={{ bg: 'brand.400' }}
-                  >
-                    Editar
-                  </Button>
-                  <Button
-                    bg={'danger.500'}
-                    color="white"
-                    _hover={{ bg: 'danger.400' }}
-                  >
-                    Eliminar
-                  </Button>
-                </Td>
-              </Tr>
-              <Tr>
-                <Td>12345678-9</Td>
-                <Td>John</Td>
-                <Td>Doe</Td>
-                <Td>Smith</Td>
-                <Td>12/11/2021</Td>
-                <Td>
-                  <Button
-                    mr={2}
-                    bg={'brand.500'}
-                    color="white"
-                    _hover={{ bg: 'brand.400' }}
-                  >
-                    Editar
-                  </Button>
-                  <Button
-                    bg={'danger.500'}
-                    color="white"
-                    _hover={{ bg: 'danger.400' }}
-                  >
-                    Eliminar
-                  </Button>
-                </Td>
-              </Tr>
+              {users.map((user) => (
+                <Tr key={user._id}>
+                  <Td>{user.dni}</Td>
+                  <Td>{user.name}</Td>
+                  <Td>{user.last_name}</Td>
+                  <Td>{user.second_last_name}</Td>
+                  <Td>{user.created_at}</Td>
+                  <Td>{user.created_by}</Td>
+                  <Td>
+                    <Button
+                      onClick={() => selectUser(user.dni)}
+                      mr={2}
+                      bg={'brand.500'}
+                      color="white"
+                      _hover={{ bg: 'brand.400' }}
+                    >
+                      Editar
+                    </Button>
+                    <Button
+                      bg={'danger.500'}
+                      color="white"
+                      _hover={{ bg: 'danger.400' }}
+                    >
+                      Eliminar
+                    </Button>
+                  </Td>
+                </Tr>
+              ))}
             </Tbody>
           </Table>
         </Box>

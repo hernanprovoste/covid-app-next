@@ -25,8 +25,8 @@ const SidebarContent = ({ onClose, image, ...rest }) => {
       {...rest}
     >
       <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
-        <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
-          <Img src={image} alt="Logo Logica Industrial" height="40px" />
+        <Text fontSize="xl" fontFamily="monospace" fontWeight="bold">
+          Logica Industrial <span style={{ fontSize: '12px' }}>Beta</span>
         </Text>
         <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
       </Flex>

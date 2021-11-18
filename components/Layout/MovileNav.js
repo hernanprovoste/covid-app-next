@@ -11,8 +11,15 @@ import {
   MenuList
 } from '@chakra-ui/menu'
 import { FiBell, FiChevronDown, FiMenu } from 'react-icons/fi'
+import { signOut, useSession } from 'next-auth/client'
 
 const MobileNav = ({ onOpen, ...rest }) => {
+  const [session, loading] = useSession()
+  console.log('from mobile nav', session)
+
+  const handleLogout = () => {
+    signOut()
+  }
   return (
     <Flex
       ml={{ base: 0, md: 60 }}
@@ -51,14 +58,14 @@ const MobileNav = ({ onOpen, ...rest }) => {
               _focus={{ boxShadow: 'none' }}
             >
               <HStack>
-                <Avatar size={'sm'} src={'./logicaLogo.svg'} />
+                <Avatar size={'sm'} src="" />
                 <VStack
                   display={{ base: 'none', md: 'flex' }}
                   alignItems="flex-start"
                   spacing="1px"
                   ml="2"
                 >
-                  <Text fontSize="sm">L&oacute;gica Industrial</Text>
+                  <Text fontSize="sm">{session.user.name}</Text>
                   <Text fontSize="xs" color="gray.600">
                     Admin
                   </Text>
@@ -73,10 +80,14 @@ const MobileNav = ({ onOpen, ...rest }) => {
               borderColor={useColorModeValue('gray.200', 'gray.700')}
             >
               <MenuItem>
-                <Link href="./profile">Perfil</Link>
+                <Link href="/profile">
+                  <a>Perfil</a>
+                </Link>
               </MenuItem>
               <MenuDivider />
-              <MenuItem>Cerrar Sesi&oacute;n</MenuItem>
+              <MenuItem as="button" onClick={handleLogout}>
+                Cerrar Sesi&oacute;n
+              </MenuItem>
             </MenuList>
           </Menu>
         </Flex>

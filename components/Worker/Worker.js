@@ -14,11 +14,19 @@ import {
 } from '@chakra-ui/react'
 import SearchInput from '../UI/SearchInput'
 
-const Worker = () => {
+const Worker = (props) => {
   const router = useRouter()
+
+  console.log(props.data)
+
+  const { workers } = props.data.workers
 
   const handleWorker = () => {
     router.push('/admin/workers/newworker')
+  }
+
+  const selectWorkers = (id) => {
+    router.push(`/admin/workers/${id}`)
   }
 
   return (
@@ -64,82 +72,39 @@ const Worker = () => {
                 <Th>Apellido Paterno</Th>
                 <Th>Apellido Materno</Th>
                 <Th>Created At</Th>
+                <Th>Created By</Th>
                 <Th>Acciones</Th>
               </Tr>
             </Thead>
             <Tbody>
-              <Tr>
-                <Td>12345678-9</Td>
-                <Td>John</Td>
-                <Td>Doe</Td>
-                <Td>Smith</Td>
-                <Td>12/11/2021</Td>
-                <Td>
-                  <Button
-                    mr={2}
-                    bg={'brand.500'}
-                    color="white"
-                    _hover={{ bg: 'brand.400' }}
-                  >
-                    Editar
-                  </Button>
-                  <Button
-                    bg={'danger.500'}
-                    color="white"
-                    _hover={{ bg: 'danger.400' }}
-                  >
-                    Eliminar
-                  </Button>
-                </Td>
-              </Tr>
-              <Tr>
-                <Td>12345678-9</Td>
-                <Td>John</Td>
-                <Td>Doe</Td>
-                <Td>Smith</Td>
-                <Td>12/11/2021</Td>
-                <Td>
-                  <Button
-                    mr={2}
-                    bg={'brand.500'}
-                    color="white"
-                    _hover={{ bg: 'brand.400' }}
-                  >
-                    Editar
-                  </Button>
-                  <Button
-                    bg={'danger.500'}
-                    color="white"
-                    _hover={{ bg: 'danger.400' }}
-                  >
-                    Eliminar
-                  </Button>
-                </Td>
-              </Tr>
-              <Tr>
-                <Td>12345678-9</Td>
-                <Td>John</Td>
-                <Td>Doe</Td>
-                <Td>Smith</Td>
-                <Td>12/11/2021</Td>
-                <Td>
-                  <Button
-                    mr={2}
-                    bg={'brand.500'}
-                    color="white"
-                    _hover={{ bg: 'brand.400' }}
-                  >
-                    Editar
-                  </Button>
-                  <Button
-                    bg={'danger.500'}
-                    color="white"
-                    _hover={{ bg: 'danger.400' }}
-                  >
-                    Eliminar
-                  </Button>
-                </Td>
-              </Tr>
+              {workers?.map((worker) => (
+                <Tr key={worker._id}>
+                  <Td>{worker.dni}</Td>
+                  <Td>{worker.name}</Td>
+                  <Td>{worker.last_name}</Td>
+                  <Td>{worker.second_last_name}</Td>
+                  <Td>{worker.created_at}</Td>
+                  <Td>{worker.created_by}</Td>
+                  <Td>
+                    <Button
+                      onClick={() => selectWorkers(worker.dni)}
+                      mr={2}
+                      bg={'brand.500'}
+                      color="white"
+                      _hover={{ bg: 'brand.400' }}
+                    >
+                      Editar
+                    </Button>
+                    <Button
+                      bg={'danger.500'}
+                      color="white"
+                      _hover={{ bg: 'danger.400' }}
+                    >
+                      Eliminar
+                    </Button>
+                  </Td>
+                </Tr>
+              ))}
             </Tbody>
           </Table>
         </Box>
